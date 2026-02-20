@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ru">
+<a href="http://www.olimpiapopipio.com">удачки тебе</a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Алина · Олимпийский детектор</title>
+    <style>
+        /* Стили (без изменений, всё как в предыдущей версии) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(45deg, #0b1c2f, #1b2f45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .screen {
+            max-width: 480px;
+            width: 100%;
+            background: rgba(10, 20, 30, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid #ffd96660;
+            border-radius: 56px;
+            padding: 30px 20px 40px;
+            box-shadow: 0 30px 40px #00000080, 0 0 30px #f0e68c30;
+            color: white;
+        }
+
+        .title {
+            font-size: clamp(1.8rem, 7vw, 2.5rem);
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, #ffe484, #ffc857);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px #ffb347;
+            margin-bottom: 24px;
+        }
+
+        .sub {
+            font-size: 1.2rem;
+            color: #aad0f5;
+            background: #1e3b4e;
+            padding: 14px 20px;
+            border-radius: 60px;
+            text-align: center;
+            border: 1px solid #fff3b0;
+            margin-bottom: 30px;
+            font-weight: 500;
+            box-shadow: 0 5px 0 #0f2a36;
+        }
+
+        .btn {
+            border: none;
+            background: #3e5d73;
+            padding: 20px 0;
+            font-size: 2rem;
+            font-weight: 700;
+            border-radius: 100px;
+            color: white;
+            box-shadow: 0 10px 0 #1d2e3a, 0 10px 20px black;
+            transition: all 0.08s linear;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            touch-action: manipulation;
+            border: 2px solid #ffffff60;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 #1d2e3a, 0 8px 18px black;
+        }
+
+        .btn-go {
+            background: #2e7d5e;
+            font-size: 2.4rem;
+            padding: 25px 0;
+            max-width: 320px;
+            box-shadow: 0 15px 0 #1b523d, 0 15px 30px black;
+        }
+
+        .btn-small {
+            font-size: 1.8rem;
+            padding: 15px 30px;
+            width: auto;
+            min-width: 140px;
+            box-shadow: 0 8px 0 #1d2e3a;
+        }
+
+        .btn-yes {
+            background: #2e7d5e;
+        }
+        
+        .btn-no {
+            background: #c0392b;
+            border-bottom: 3px solid #8b2c1a;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        .stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 8px solid #ffe68f;
+            border-top: 8px solid #c0392b;
+            border-radius: 50%;
+            animation: spin 0.9s infinite linear;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message-box {
+            background: #0f2637;
+            border-radius: 60px;
+            padding: 24px 20px;
+            border: 2px solid #ffb347;
+            font-size: 1.5rem;
+            text-align: center;
+            box-shadow: inset 0 -3px 0 #7f8c8d, 0 10px 20px black;
+            width: 100%;
+            line-height: 1.4;
+        }
+
+        /* КОТИКИ */
+        .cats-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cat-image {
+            width: 280px;
+            height: 280px;
+            background: #2d4e6e;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #ffb347;
+            box-shadow: 0 20px 30px black;
+            overflow: hidden;
+        }
+
+        .cat-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .cat-placeholder {
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .cat-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .cat-nav button {
+            background: #ffb347;
+            border: none;
+            font-size: 2.5rem;
+            width: 70px;
+            height: 70px;
+            border-radius: 50px;
+            box-shadow: 0 5px 0 #a0661c;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: 0.05s linear;
+            color: black;
+        }
+
+        .cat-nav button:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        .cat-counter {
+            font-size: 1.5rem;
+            background: #00000060;
+            padding: 8px 25px;
+            border-radius: 40px;
+        }
+
+        /* ФАКТЫ */
+        .facts-container {
+            width: 100%;
+            background: #d4a76a;
+            border-radius: 40px;
+            padding: 40px 20px;
+            box-shadow: 10px 10px 0 #8b6b42, 0 20px 30px black;
+            cursor: pointer;
+            transition: 0.1s;
+            border-left: 10px solid #b38b54;
+            color: #2c3e50;
+            font-weight: bold;
+            text-align: center;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .facts-container:active {
+            transform: translate(5px, 5px);
+            box-shadow: 5px 5px 0 #8b6b42, 0 15px 25px black;
+        }
+
+        .fact-title {
+            font-size: 1.8rem;
+            background: #f9e0a0;
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            display: inline-block;
+            align-self: center;
+        }
+
+        .fact-text {
+            font-size: 1.5rem;
+            line-height: 1.4;
+            color: #1e2b38;
+            background: #fff3d6;
+            padding: 20px;
+            border-radius: 30px;
+            margin: 10px 0;
+        }
+
+        .fact-counter {
+            font-size: 1.5rem;
+            background: #5a3e1b;
+            color: #ffd966;
+            padding: 10px 20px;
+            border-radius: 60px;
+            margin-top: 15px;
+        }
+
+        /* ИСТОРИЧЕСКИЕ ЛИЧНОСТИ */
+        .history-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .history-card {
+            width: 100%;
+            background: #2c3e50;
+            border-radius: 50px;
+            padding: 30px 20px;
+            border: 3px solid #ffb347;
+            box-shadow: 0 15px 0 #1a2632, 0 20px 30px black;
+        }
+
+        .history-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 4px solid #ffd966;
+            overflow: hidden;
+            background: #1e3b4e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .history-image-placeholder {
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .history-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffd966;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .history-quote {
+            font-size: 1.5rem;
+            line-height: 1.4;
+            background: #f9e0a0;
+            color: #1e2b38;
+            padding: 25px;
+            border-radius: 40px;
+            margin: 15px 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .history-note {
+            font-size: 1.2rem;
+            color: #aad0f5;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .history-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .history-nav button {
+            background: #ffb347;
+            border: none;
+            font-size: 2.5rem;
+            width: 70px;
+            height: 70px;
+            border-radius: 50px;
+            box-shadow: 0 5px 0 #a0661c;
+            cursor: pointer;
+            touch-action: manipulation;
+            color: black;
+        }
+
+        .history-nav button:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        .history-counter {
+            font-size: 1.5rem;
+            background: #00000060;
+            padding: 8px 25px;
+            border-radius: 40px;
+        }
+
+        /* ТЕСТ */
+        .test-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .test-question {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffd966;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .test-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .test-option {
+            background: #1e3b4e;
+            border: 2px solid #ffb347;
+            border-radius: 60px;
+            padding: 18px 20px;
+            font-size: 1.4rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 5px 0 #0f2a36;
+        }
+
+        .test-option:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #0f2a36;
+        }
+
+        .test-option.selected {
+            background: #2e7d5e;
+            border-color: #ffd966;
+            box-shadow: 0 5px 0 #1b523d;
+        }
+
+        .test-progress {
+            font-size: 1.3rem;
+            color: #aad0f5;
+            margin-top: 10px;
+        }
+
+        /* РЕЗУЛЬТАТ */
+        .result-box {
+            background: #2e7d5e;
+            border-radius: 60px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 3px solid gold;
+            font-size: 1.8rem;
+            line-height: 1.4;
+            width: 100%;
+        }
+
+        .pizdec-small {
+            background: #c0392b;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            max-width: 200px;
+            margin-top: 10px;
+            box-shadow: 0 5px 0 #7f2a1f;
+        }
+
+        .compliments-full {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 20, 30, 0.98);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            z-index: 1000;
+            font-size: 1.6rem;
+            line-height: 1.8;
+            text-align: center;
+            color: #ffd966;
+            border: 4px solid gold;
+            border-radius: 0;
+        }
+
+        .compliments-full button {
+            position: absolute;
+            bottom: 40px;
+            background: #2e7d5e;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .final-message {
+            font-size: 2rem;
+            background: #145a32;
+            padding: 40px 20px;
+            border-radius: 80px;
+            border: 3px solid gold;
+        }
+
+        /* Кнопки НЕТ и ХОРОШО */
+        .button-pair {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0 10px;
+            position: relative;
+            min-height: 180px;
+            width: 100%;
+        }
+
+        .btn-no.runaway {
+            position: absolute;
+            transition: left 0.15s, top 0.15s, right 0.15s, bottom 0.15s;
+            z-index: 30;
+            background: #c0392b;
+        }
+
+        .btn-scale {
+            transition: transform 0.2s, background 0.2s;
+            transform-origin: center;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+    <div class="screen" id="mainScreen">
+        <!-- СТАРТ -->
+        <div id="startStage" class="stage">
+            <div class="title">Алина, на носу Олимпиада!</div>
+            <div class="sub">🏅 проверим, готова ли ты к ней? 🏅</div>
+            <button class="btn btn-go" id="goBtn">👉 ПОЕХАЛИ 👈</button>
+        </div>
+
+        <!-- ВОПРОС -->
+        <div id="questionStage" class="stage hidden">
+            <div class="title">🔍 детектор 🔍</div>
+            <div class="message-box" style="font-size:1.8rem;">Алина, ты готова к олимпиаде?</div>
+            <div class="button-pair" style="display:flex; gap:20px; justify-content:center; position:static;">
+                <button class="btn btn-small btn-yes" id="answerYes">ДА</button>
+                <button class="btn btn-small btn-no" id="answerNo">НЕТ</button>
+            </div>
+        </div>
+
+        <!-- ЗАГРУЗКА -->
+        <div id="loadingStage" class="stage hidden">
+            <div class="loader"></div>
+            <div class="message-box">⚡ анализ уверенности ⚡</div>
+        </div>
+
+        <!-- РЕЗУЛЬТАТ "ДА" -->
+        <div id="resultYesStage" class="stage hidden">
+            <div class="message-box attention" style="color:#ffaaaa;">⚠️ ВНИМАНИЕ<br>обнаружена неуверенность</div>
+            <div class="sub">надо исправлять!</div>
+            <button class="btn btn-small" id="startConfidence" style="background:#2e7d5e;">👉 начать</button>
+        </div>
+
+        <!-- ЭКРАН С КОТИКАМИ -->
+        <div id="catsStage" class="stage hidden">
+            <div class="title">😻 ПОДНИМАЕМ УВЕРЕННОСТЬ 😻</div>
+            <div class="cats-container">
+                <div class="cat-image" id="catImageContainer">
+                    <div class="cat-placeholder" id="catPlaceholder">котик скоро будет</div>
+                </div>
+                <div class="cat-nav">
+                    <button id="prevCat">◀</button>
+                    <span class="cat-counter" id="catCounter">1/5</span>
+                    <button id="nextCat">▶</button>
+                </div>
+            </div>
+            <button class="btn btn-small" id="catsDone" style="background:#2e7d5e;">я насмотрелась</button>
+        </div>
+
+        <!-- ЭКРАН ФАКТОВ -->
+        <div id="factsStage" class="stage hidden">
+            <div class="title">📚 ПОВТОРЕНИЕ МАТЕРИАЛА 📚</div>
+            <div class="facts-container" id="factsContainer">
+                <div class="fact-title">📖 ФАКТ 📖</div>
+                <div class="fact-text" id="factText">Нажимай, чтобы узнать факт</div>
+                <div class="fact-counter" id="factCounter">1/8</div>
+            </div>
+            <div class="sub">нажимай на факты (нужно 8)</div>
+            <button class="btn btn-small hidden" id="factsDone" style="background:#2e7d5e;">👉 мы повторили</button>
+        </div>
+
+        <!-- ИСТОРИЧЕСКАЯ ПОДДЕРЖКА -->
+        <div id="historyStage" class="stage hidden">
+            <div class="title">👑 ИСТОРИЧЕСКАЯ ПОДДЕРЖКА 👑</div>
+            <div class="history-container">
+                <div class="history-card" id="historyCard">
+                    <div class="history-image" id="historyImageContainer">
+                        <div class="history-image-placeholder" id="historyImagePlaceholder">фото историка</div>
+                    </div>
+                    <div class="history-name" id="historyName">Витовт</div>
+                    <div class="history-quote" id="historyQuote">Князь Витовт завещал: не дрочи перед олимпиадой, просто иди и делай</div>
+                    <div class="history-note" id="historyNote">Великий князь литовский</div>
+                </div>
+                <div class="history-nav">
+                    <button id="prevHistory">◀</button>
+                    <span class="history-counter" id="historyCounter">1/9</span>
+                    <button id="nextHistory">▶</button>
+                </div>
+            </div>
+            <button class="btn btn-small" id="historyDone" style="background:#2e7d5e;">👉 дальше</button>
+        </div>
+
+        <!-- ТЕСТ -->
+        <div id="testStage" class="stage hidden">
+            <div class="title">📊 ПРОВЕРКА ГОТОВНОСТИ 📊</div>
+            <div class="test-container" id="testContainer">
+                <div class="test-question" id="testQuestion"></div>
+                <div class="test-options" id="testOptions"></div>
+                <div class="test-progress" id="testProgress"></div>
+            </div>
+        </div>
+
+        <!-- ЗАГРУЗКА ПОСЛЕ ТЕСТА -->
+        <div id="loadingAfterTestStage" class="stage hidden">
+            <div class="loader"></div>
+            <div class="message-box">⚡ обрабатываем результаты ⚡</div>
+        </div>
+
+        <!-- РЕЗУЛЬТАТ ТЕСТА -->
+        <div id="testResultStage" class="stage hidden">
+            <div class="result-box" id="testResult">Ты готова на 99%, это уже больше, чем у твоих конкурентов, вы готовы</div>
+            <button class="btn pizdec-small" id="pizdecBtn">🚨 если вообще пиздец жми 🚨</button>
+            <button class="btn btn-small" id="testFinalContinue" style="background:#2e7d5e; margin-top:10px;">✨ продолжаем ✨</button>
+        </div>
+
+        <!-- ФИНАЛ -->
+        <div id="finalStage" class="stage hidden">
+            <div class="final-message">🎉 ТЫ ГОТОВА! УДАЧИ НА ОЛИМПИАДЕ! 🎉</div>
+        </div>
+
+        <!-- НЕТ ВЕТКА: убегающие кнопки -->
+        <div id="resultNoStage" class="stage hidden">
+            <div class="message-box" style="border-color:#e74c3c; background:#4a1e1e;">
+                <span style="color:#ffb3b3;">🚨 ТРЕВОГА! 🚨</span><br>КРИТИЧЕСКИЙ НЕДОСТАТОК ВЕРЫ В СЕБЯ
+            </div>
+            <div class="sub">👇 сейчас будем исправлять 👇</div>
+            <div class="button-pair" id="runawayContainer" style="position: relative; min-height: 180px;">
+                <button class="btn btn-small btn-no runaway" id="runawayNo">НЕТ</button>
+                <button class="btn btn-small btn-yes btn-scale" id="growYes">ХОРОШО</button>
+            </div>
+        </div>
+
+        <!-- ТРАНСФОРМАЦИЯ НЕТ -->
+        <div id="transformedStage" class="stage hidden">
+            <div class="message-box" style="background:#1e5f3e;">✨ трансформация ✨<br>НЕТ превратилось в ДА!</div>
+            <button class="btn btn-small btn-yes" id="transformedYes" style="font-size:2.5rem;">ДА</button>
+        </div>
+
+        <!-- ЗАГРУЗКА ПЕРЕД НЕТ (для красоты) -->
+        <div id="loadingBeforeNoStage" class="stage hidden">
+            <div class="loader"></div>
+            <div class="message-box">⚡ сканирование самооценки ⚡</div>
+        </div>
+    </div>
+
+    <!-- Комплименты на весь экран -->
+    <div id="complimentsFull" class="compliments-full hidden">
+        <div>
+            ты невероятная, самая лучшая, прекрасная, великолепная, восхитительная, обворожительная, очаровательная, божественная, идеальная, неповторимая, единственная, нежная, ласковая, добрая, искренняя, настоящая, яркая, лучистая, солнечная, теплая, родная, любимая, желанная, бесценная, золотая, умная, талантливая, сильная, смелая, мудрая, самая-самая
+        </div>
+        <button id="closeCompliments">❌ закрыть</button>
+    </div>
+
+    <script>
+        (function() {
+            // Экраны
+            const startStage = document.getElementById('startStage');
+            const questionStage = document.getElementById('questionStage');
+            const loadingStage = document.getElementById('loadingStage');
+            const resultYesStage = document.getElementById('resultYesStage');
+            const catsStage = document.getElementById('catsStage');
+            const factsStage = document.getElementById('factsStage');
+            const historyStage = document.getElementById('historyStage');
+            const testStage = document.getElementById('testStage');
+            const loadingAfterTestStage = document.getElementById('loadingAfterTestStage');
+            const testResultStage = document.getElementById('testResultStage');
+            const finalStage = document.getElementById('finalStage');
+            const resultNoStage = document.getElementById('resultNoStage');
+            const transformedStage = document.getElementById('transformedStage');
+            const loadingBeforeNoStage = document.getElementById('loadingBeforeNoStage');
+
+            // Кнопки
+            const goBtn = document.getElementById('goBtn');
+            const answerYes = document.getElementById('answerYes');
+            const answerNo = document.getElementById('answerNo');
+            const startConfidence = document.getElementById('startConfidence');
+            const catsDone = document.getElementById('catsDone');
+            const factsDone = document.getElementById('factsDone');
+            const historyDone = document.getElementById('historyDone');
+            const pizdecBtn = document.getElementById('pizdecBtn');
+            const testFinalContinue = document.getElementById('testFinalContinue');
+            const closeCompliments = document.getElementById('closeCompliments');
+            const complimentsFull = document.getElementById('complimentsFull');
+            const runawayNo = document.getElementById('runawayNo');
+            const growYes = document.getElementById('growYes');
+            const transformedYes = document.getElementById('transformedYes');
+            
+            // Котики
+            const prevCat = document.getElementById('prevCat');
+            const nextCat = document.getElementById('nextCat');
+            const catCounter = document.getElementById('catCounter');
+            const catImageContainer = document.getElementById('catImageContainer');
+            const catPlaceholder = document.getElementById('catPlaceholder');
+            
+            // Факты
+            const factsContainer = document.getElementById('factsContainer');
+            const factText = document.getElementById('factText');
+            const factCounter = document.getElementById('factCounter');
+            let factIndex = 0;
+            
+            // Исторические личности
+            const historyImageContainer = document.getElementById('historyImageContainer');
+            const historyImagePlaceholder = document.getElementById('historyImagePlaceholder');
+            const historyName = document.getElementById('historyName');
+            const historyQuote = document.getElementById('historyQuote');
+            const historyNote = document.getElementById('historyNote');
+            const prevHistory = document.getElementById('prevHistory');
+            const nextHistory = document.getElementById('nextHistory');
+            const historyCounter = document.getElementById('historyCounter');
+            let historyIndex = 0;
+
+            // Тест
+            const testQuestion = document.getElementById('testQuestion');
+            const testOptions = document.getElementById('testOptions');
+            const testProgress = document.getElementById('testProgress');
+            let currentQuestion = 0;
+            let answers = [];
+
+            // Переменные для убегающей кнопки
+            let noClickCount = 0;
+
+            // Массивы данных
+            const facts = [
+                "Стресс помогает мобилизовать ресурсы организма",
+                "Уверенные люди улыбаются на 30% чаще",
+                "Мозг лучше работает, когда ты веришь в успех",
+                "Олимпиады выигрывают не гении, а настойчивые",
+                "После трёх часов подготовки выделяется дофамин",
+                "Твой главный соперник — это ты вчерашний",
+                "Даже 5 минут визуализации успеха повышают результат",
+                "Ты уже прошла долгий путь — осталось чуть-чуть"
+            ];
+
+            const historyData = [
+                { 
+                    name: "Витовт", 
+                    quote: "Князь Витовт завещал: не дрочи перед олимпиадой, просто иди и делай", 
+                    note: "Великий князь литовский",
+                    image: "vitovt.jpg"
+                },
+                { 
+                    name: "Кастусь Калиновский", 
+                    quote: "Каб не ты, то хто?", 
+                    note: "Руководитель восстания",
+                    image: "kastus.jpg"
+                },
+                { 
+                    name: "Франциск Скорина", 
+                    quote: "Книги — это круто, но ты и без них — целая история", 
+                    note: "Первопечатник",
+                    image: "skorina.jpg"
+                },
+                { 
+                    name: "Ягайло", 
+                    quote: "Страшно? Мне тоже. Но я пошёл и порвал. Ты иди тоже", 
+                    note: "Король польский",
+                    image: "yagaylo.jpg"
+                },
+                { 
+                    name: "Сталин", 
+                    quote: "Ни шагу назад. А ты вообще иди вперёд и побеждай. Врага будем добивать на его территории.", 
+                    note: "Генералиссимус",
+                    image: "stalin.jpg"
+                },
+                { 
+                    name: "Николай II", 
+                    quote: "Семья — это главное. Я за тебя, ты за меня. Только у меня расстрел, а у тебя олимпиада. Так что у тебя легче. Иди.", 
+                    note: "Император",
+                    image: "nikolai.jpg"
+                },
+                { 
+                    name: "Александр Македонский", 
+                    quote: "Бояться — нормально. Я боялся, когда в Индию шёл. Но я пошёл. И ты иди. А бояться будешь потом. Нет, потом уже не надо будет. Всё будет пучком", 
+                    note: "Великий полководец",
+                    image: "makedonsky.jpg"
+                },
+                { 
+                    name: "Юлий Цезарь", 
+                    quote: "Иду в сенат. Если через час не вернусь — начинайте без меня. А лучше сразу наливайте.", 
+                    note: "Римский император",
+                    image: "cezar.jpg"
+                },
+                { 
+                    name: "Христофор Колумб", 
+                    quote: "Доплыли до Америки, а там — ни пива, ни рыб. Нахуй мы вообще плыли?", 
+                    note: "Мореплаватель",
+                    image: "kolumb.jpg"
+                }
+            ];
+
+            const testQuestions = [
+                {
+                    question: "Когда в последний раз ты открывала учебник?",
+                    options: ["сегодня", "неделю назад", "мне снился учебник", "а что такое учебник"]
+                },
+                {
+                    question: "Что сказал внутренний голос?",
+                    options: ["Иди и делай, сука", "А может, ну нахуй?", "Главное — шоколадку не забудь", "Молчит, потому что сдох от страха"]
+                },
+                {
+                    question: "Твой девиз на сегодня",
+                    options: ["Пан или пропал, как шведы под Полтавой", "Авось пронесёт, как Кузькина мать", "Я самая умная, идите все в жопу", "Бог не выдаст — свинья не съест"]
+                },
+                {
+                    question: "Ты пиздатая?",
+                    options: ["да", "вы сомневались?", "конечно", "а потом"]
+                }
+            ];
+
+            // Функция переключения экранов
+            function hideAll() {
+                const stages = [startStage, questionStage, loadingStage, resultYesStage, catsStage, factsStage, historyStage, testStage, loadingAfterTestStage, testResultStage, finalStage, resultNoStage, transformedStage, loadingBeforeNoStage];
+                stages.forEach(s => s.classList.add('hidden'));
+            }
+
+            function showStage(stage) {
+                hideAll();
+                stage.classList.remove('hidden');
+            }
+
+            // ===== КОТИКИ =====
+            let currentCat = 1;
+            const totalCats = 5;
+
+            function updateCatImage() {
+                catPlaceholder.innerText = `🐱 котик ${currentCat} (тут будет твоё фото)`;
+            }
+
+            prevCat.addEventListener('click', () => {
+                currentCat = currentCat > 1 ? currentCat - 1 : totalCats;
+                updateCatImage();
+                catCounter.innerText = `${currentCat}/${totalCats}`;
+            });
+
+            nextCat.addEventListener('click', () => {
+                currentCat = currentCat < totalCats ? currentCat + 1 : 1;
+                updateCatImage();
+                catCounter.innerText = `${currentCat}/${totalCats}`;
+            });
+
+            // ===== ФАКТЫ =====
+            factsContainer.addEventListener('click', () => {
+                if (factIndex < facts.length - 1) {
+                    factIndex++;
+                } else {
+                    factIndex = 0;
+                }
+                factText.innerText = facts[factIndex];
+                factCounter.innerText = `${factIndex + 1}/${facts.length}`;
+                
+                if (factIndex === facts.length - 1) {
+                    factsDone.classList.remove('hidden');
+                }
+            });
+
+            // ===== ИСТОРИЧЕСКИЕ ЛИЧНОСТИ =====
+            function updateHistory(index) {
+                const person = historyData[index];
+                historyName.innerText = person.name;
+                historyQuote.innerText = person.quote;
+                historyNote.innerText = person.note;
+                historyCounter.innerText = `${index + 1}/${historyData.length}`;
+                historyImagePlaceholder.innerText = `фото ${person.name}`;
+            }
+
+            prevHistory.addEventListener('click', () => {
+                historyIndex = historyIndex > 0 ? historyIndex - 1 : historyData.length - 1;
+                updateHistory(historyIndex);
+            });
+
+            nextHistory.addEventListener('click', () => {
+                historyIndex = historyIndex < historyData.length - 1 ? historyIndex + 1 : 0;
+                updateHistory(historyIndex);
+            });
+
+            // ===== ТЕСТ =====
+            function loadQuestion() {
+                const q = testQuestions[currentQuestion];
+                testQuestion.innerText = q.question;
+                
+                let optionsHtml = '';
+                q.options.forEach((option, index) => {
+                    optionsHtml += `<div class="test-option" data-option="${index}">${option}</div>`;
+                });
+                testOptions.innerHTML = optionsHtml;
+                
+                testProgress.innerText = `Вопрос ${currentQuestion + 1} из ${testQuestions.length}`;
+                
+                document.querySelectorAll('.test-option').forEach(opt => {
+                    opt.addEventListener('click', (e) => {
+                        document.querySelectorAll('.test-option').forEach(o => o.classList.remove('selected'));
+                        opt.classList.add('selected');
+                        answers[currentQuestion] = opt.dataset.option;
+                        
+                        setTimeout(() => {
+                            if (currentQuestion < testQuestions.length - 1) {
+                                currentQuestion++;
+                                loadQuestion();
+                            } else {
+                                showStage(loadingAfterTestStage);
+                                setTimeout(() => {
+                                    showStage(testResultStage);
+                                }, 1500);
+                            }
+                        }, 300);
+                    });
+                });
+            }
+
+            // ===== КОМПЛИМЕНТЫ =====
+            pizdecBtn.addEventListener('click', () => {
+                complimentsFull.classList.remove('hidden');
+            });
+
+            closeCompliments.addEventListener('click', () => {
+                complimentsFull.classList.add('hidden');
+            });
+
+            // ===== УБЕГАЮЩАЯ КНОПКА =====
+            function moveRunawayButton() {
+                const container = document.getElementById('runawayContainer');
+                if (!container || !runawayNo) return;
+
+                const containerW = container.clientWidth;
+                const containerH = container.clientHeight;
+                const noBtnW = runawayNo.offsetWidth;
+                const noBtnH = runawayNo.offsetHeight;
+
+                let maxX = Math.max(20, containerW - noBtnW - 20);
+                let maxY = Math.max(20, containerH - noBtnH - 20);
+
+                let newX = Math.floor(Math.random() * maxX);
+                let newY = Math.floor(Math.random() * maxY);
+
+                runawayNo.style.position = 'absolute';
+                runawayNo.style.left = newX + 'px';
+                runawayNo.style.top = newY + 'px';
+                runawayNo.style.zIndex = '30';
+            }
+
+            runawayNo.addEventListener('click', (e) => {
+                e.stopPropagation();
+                noClickCount++;
+
+                if (growYes) {
+                    let currentScale = 1;
+                    const transform = growYes.style.transform;
+                    if (transform && transform.includes('scale')) {
+                        const match = transform.match(/scale\(([^)]+)\)/);
+                        if (match && match[1]) currentScale = parseFloat(match[1]);
+                    }
+                    growYes.style.transform = `scale(${currentScale + 0.1})`;
+                }
+
+                if (runawayNo) {
+                    let currentNoScale = 1;
+                    const noTransform = runawayNo.style.transform;
+                    if (noTransform && noTransform.includes('scale')) {
+                        const match = noTransform.match(/scale\(([^)]+)\)/);
+                        if (match && match[1]) currentNoScale = parseFloat(match[1]);
+                    }
+                    let newNoScale = Math.max(0.2, currentNoScale - 0.05);
+                    runawayNo.style.transform = `scale(${newNoScale})`;
+                }
+
+                if (noClickCount >= 10) {
+                    showStage(transformedStage);
+                    return;
+                }
+
+                moveRunawayButton();
+            });
+
+            runawayNo.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                runawayNo.click();
+            });
+
+            // ===== СЦЕНАРИЙ =====
+            goBtn.addEventListener('click', () => showStage(questionStage));
+            goBtn.addEventListener('touchstart', (e) => { e.preventDefault(); showStage(questionStage); });
+
+            // ДА
+            answerYes.addEventListener('click', () => {
+                showStage(loadingStage);
+                setTimeout(() => {
+                    showStage(resultYesStage);
+                }, 1500);
+            });
+            answerYes.addEventListener('touchstart', (e) => { e.preventDefault(); answerYes.click(); });
+
+            startConfidence.addEventListener('click', () => {
+                showStage(catsStage);
+                currentCat = 1;
+                catCounter.innerText = `${currentCat}/${totalCats}`;
+                updateCatImage();
+            });
+
+            catsDone.addEventListener('click', () => {
+                showStage(factsStage);
+                factIndex = 0;
+                factText.innerText = facts[0];
+                factCounter.innerText = `1/${facts.length}`;
+                factsDone.classList.add('hidden');
+            });
+
+            factsDone.addEventListener('click', () => {
+                showStage(historyStage);
+                historyIndex = 0;
+                updateHistory(0);
+            });
+
+            historyDone.addEventListener('click', () => {
+                showStage(testStage);
+                currentQuestion = 0;
+                answers = [];
+                loadQuestion();
+            });
+
+            testFinalContinue.addEventListener('click', () => {
+                showStage(finalStage);
+            });
+
+            // НЕТ: загрузка -> убегающие кнопки
+            answerNo.addEventListener('click', () => {
+                showStage(loadingBeforeNoStage);
+                noClickCount = 0;
+                if (growYes) growYes.style.transform = 'scale(1)';
+                if (runawayNo) {
+                    runawayNo.style.position = 'static';
+                    runawayNo.style.left = 'auto';
+                    runawayNo.style.top = 'auto';
+                    runawayNo.style.transform = 'scale(1)';
+                }
+                setTimeout(() => {
+                    showStage(resultNoStage);
+                }, 1500);
+            });
+            answerNo.addEventListener('touchstart', (e) => { e.preventDefault(); answerNo.click(); });
+
+            // После трансформации "НЕТ" -> историческая поддержка
+            transformedYes.addEventListener('click', () => {
+                showStage(historyStage);
+                historyIndex = 0;
+                updateHistory(0);
+            });
+
+        })();
+    </script>
+</body>
+</html>
